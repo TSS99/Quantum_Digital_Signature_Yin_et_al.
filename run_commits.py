@@ -119,7 +119,8 @@ updates = [
 def apply_updates():
     for step, update in enumerate(updates):
         # We need to re-read each time because inserting changes indices
-        nb = nbformat.read('QDS_Yin_et_al.ipynb', as_version=4)
+        with open('QDS_Yin_et_al.ipynb', 'r', encoding='utf-8') as f:
+            nb = nbformat.read(f, as_version=4)
         
         # Figure out where the markdown cells are
         md_indices = [i for i, c in enumerate(nb.cells) if c.cell_type == 'markdown']
@@ -140,7 +141,8 @@ def apply_updates():
         elif action == 'insert':
             nb.cells.insert(target, new_cell)
             
-        nbformat.write(nb, 'QDS_Yin_et_al.ipynb')
+        with open('QDS_Yin_et_al.ipynb', 'w', encoding='utf-8') as f:
+            nbformat.write(nb, f)
         
         # Git commit and push
         subprocess.run(['git', 'add', 'QDS_Yin_et_al.ipynb'], check=True)
