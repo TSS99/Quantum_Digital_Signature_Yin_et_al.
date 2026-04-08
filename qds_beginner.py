@@ -48,6 +48,24 @@ CONFIG = {
     "epsilon_target": 1e-10,
 }
 
+BEGINNER_TERMS = {
+    "bM": "Document length in bits after encoding.",
+    "bH": "Hash output length. Larger values reduce forgery probability.",
+    "bH_prime": "Authentication-tag length used on the Bob/Charlie channel.",
+    "XA": "Alice's effective secret key.",
+    "XB": "Bob's key share.",
+    "XC": "Charlie's key share.",
+    "p_a": "Fresh irreducible polynomial chosen for one signature.",
+    "T_{p,s}": "Toeplitz matrix built from the polynomial p and seed s.",
+    "h_a": "Hash of the document under the Toeplitz construction.",
+    "Dig": "Internal digest equal to hash bits plus polynomial bits.",
+    "Sig": "Published signature, which is the digest hidden by a one-time pad.",
+    "lS": "Signature length in bits.",
+    "lP": "Total pre-shared key material consumed by the protocol.",
+    "eps_for": "Forgery bound for a dishonest verifier.",
+    "eps_rep": "Repudiation bound for a dishonest signer.",
+}
+
 
 def compute_security_params(bM: int, epsilon_target: float = 1e-10) -> dict:
     """Compute optimal Protocol 1 security parameters (Grasselli et al. Eqs. 29-30).
@@ -267,7 +285,7 @@ def is_irreducible_gf2(poly_int: int, degree: int) -> bool:
               gcd(p(x), x^(2^(n/q)) XOR x) = 1  (mod p(x))
       (2) x^(2^n) = x  (mod p(x))
 
-    Time complexity: O(n^2 log n) using repeated squaring — feasible for n ~200.
+    Time complexity: O(n^2 log n) using repeated squaring - feasible for n ~200.
 
     Args:
         poly_int (int): Polynomial as integer.
@@ -403,7 +421,7 @@ def lfsr_generate_sequence(poly_int: int, initial_state_bits: np.ndarray,
         raise ValueError(f"LFSR degree (bH) must be >= 4, got {degree}")
     if not np.any(initial_state_bits):
         raise ValueError(
-            "LFSR initial state must not be all zeros — "
+            "LFSR initial state must not be all zeros - "
             "this produces the degenerate all-zero output sequence."
         )
     if not is_irreducible_gf2(poly_int, degree):
@@ -467,7 +485,7 @@ def build_toeplitz_matrix(poly_int: int, initial_state_bits: np.ndarray,
 
 
 def hash_document(toeplitz_matrix: np.ndarray, doc_bits: np.ndarray) -> np.ndarray:
-    """Compute h = T * Doc (mod 2) — GF(2) matrix-vector product.
+    """Compute h = T * Doc (mod 2) - GF(2) matrix-vector product.
 
     Each output bit h_i = XOR_{j=0}^{bM-1} T[i,j] * Doc[j] (binary dot product).
     Implemented efficiently using integer dot product followed by mod 2.
@@ -516,7 +534,7 @@ def simulate_qkd_keys(bH: int, rng=None) -> tuple:
             (backed by os.urandom, cryptographically secure).
 
     Returns:
-        tuple: (XA, XB, XC) — numpy uint8 arrays of length 3*bH,
+        tuple: (XA, XB, XC) - numpy uint8 arrays of length 3*bH,
             satisfying XA[i] = XB[i] XOR XC[i] for all i.
 
     Raises:
@@ -1102,7 +1120,7 @@ def run_qds_protocol(document: str, bM: int, bH: int, bH_prime: int,
     eps_rep = (bM + 2 * bH) / (2 ** (bH_prime - 1))
 
     if verbose:
-        print(f"\n{'='*60}\nQDS Protocol 1 — Full Execution\n{'='*60}")
+        print(f"\n{'='*60}\nQDS Protocol 1 - Full Execution\n{'='*60}")
         print(f"Document: '{document}'")
         print(f"bM={bM:,d}, bH={bH}, bH'={bH_prime}")
         print(f"eps_for={eps_for:.2e}, eps_rep={eps_rep:.2e}")
@@ -1167,3 +1185,29 @@ def run_qds_protocol(document: str, bM: int, bH: int, bH_prime: int,
         "agreement": agreement, "success": success,
         "eps_for": eps_for, "eps_rep": eps_rep, "lS": lS, "lP": lP,
     }
+
+
+def format_result_summary(result: dict) -> str:
+    """Return a compact human-readable summary of a protocol run."""
+    return "\n".join(
+        [
+            "Summary",
+            "-" * 45,
+            f"Protocol success : {result['success']}",
+            f"Bob accepted     : {result['bob_accept']}",
+            f"Charlie accepted : {result['charlie_accept']}",
+            f"Agreement        : {result['agreement']}",
+            f"lS               : {result['lS']} bits",
+            f"lP               : {result['lP']} bits",
+            f"eps_for          : {result['eps_for']:.2e}",
+            f"eps_rep          : {result['eps_rep']:.2e}",
+        ]
+    )
+
+
+def format_beginner_terms() -> str:
+    """Return a compact glossary of the most common symbols in the project."""
+    lines = ["Beginner term cheat sheet", "-" * 45]
+    for name, meaning in BEGINNER_TERMS.items():
+        lines.append(f"{name:<10} : {meaning}")
+    return "\n".join(lines)
