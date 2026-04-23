@@ -1,30 +1,47 @@
-# Quantum Digital Signature - Beginner-Friendly Edition
+# Quantum Digital Signature - Yin et al.
 
-This project implements the Quantum Digital Signature (QDS) protocol based on Yin et al.
+This repository explores a Quantum Digital Signature (QDS) construction based on Yin et al. The core implementation lives in [QDS_Yin_et_al.ipynb](QDS_Yin_et_al.ipynb), which now includes more beginner-friendly markdown so a first-time reader can follow the protocol before diving into the heavier proof sections.
 
-The original repository centered around a single research-style notebook. This version keeps that notebook, but also adds simpler entry points so you can understand the protocol in layers instead of all at once.
+## What This Repo Covers
 
-## Start Here
+- GF(2) arithmetic for the bit-level polynomial operations used by the protocol
+- LFSR-generated Toeplitz hashing
+- a software abstraction of the QKD key-distribution stage
+- Alice's signing procedure
+- Bob and Charlie's independent verification logic
+- authenticated classical channels for non-repudiation
+- attack simulations and parameter-tuning experiments
 
-If you are new to the project, use this order:
+## Best Place To Start
 
-1. Read `BEGINNER_GUIDE.md`
-2. Open `QDS_Beginner_Walkthrough.ipynb`
-3. Run `python beginner_demo.py --show-terms`
-4. Explore `qds_beginner.py`
-5. Dive into `QDS_Yin_et_al.ipynb` for the full derivations, validation checks, attack simulations, and plots
+If you are new to the topic, use this order:
 
-## Files
+1. Read the opening sections of [QDS_Yin_et_al.ipynb](QDS_Yin_et_al.ipynb).
+2. On your first pass, focus on `Quick Symbol Guide`, `GF(2) Arithmetic`, `LFSR Construction and the Toeplitz Matrix`, `Key Distribution`, `Signing`, `Authenticated Channels`, and `Verification`.
+3. Return later to the attack simulations, parameter optimization, and the `p_a` reuse loophole proof.
 
-- `BEGINNER_GUIDE.md`: glossary, workflow, and common beginner questions
-- `QDS_Beginner_Walkthrough.ipynb`: shortest guided notebook for first-time readers
-- `beginner_demo.py`: simple end-to-end script you can run from the terminal
-- `qds_beginner.py`: reusable Python module with the core protocol logic
-- `QDS_Yin_et_al.ipynb`: full notebook with mathematical background, proofs, tests, and simulations
-- `attack_results.png`: attack simulation plot
-- `performance_plots.png`: parameter and performance plots
+The notebook is written so you can understand the workflow first:
 
-## Requirements
+`key setup -> hashing -> signing -> authenticated exchange -> verification`
+
+## Beginner Notes
+
+- The notebook does not simulate quantum optics or quantum circuits.
+- The QKD stage is abstracted as trusted correlated key generation so the implementation can focus on the signature logic.
+- The most important security rule in the notebook is that the signing polynomial `p_a` must be fresh for every signature.
+
+## Repository Layout
+
+- [QDS_Yin_et_al.ipynb](QDS_Yin_et_al.ipynb): main notebook with the full implementation, walkthrough text, attack simulations, and plots
+- [QDS_Beginner_Walkthrough.ipynb](QDS_Beginner_Walkthrough.ipynb): shorter guided notebook for first-time readers
+- [BEGINNER_GUIDE.md](BEGINNER_GUIDE.md): glossary, workflow overview, and common beginner questions
+- [qds_beginner.py](qds_beginner.py): simplified Python module with the core protocol logic
+- [beginner_demo.py](beginner_demo.py): small terminal demo
+- [attack_results.png](attack_results.png): attack simulation figure
+- [performance_plots.png](performance_plots.png): parameter and performance plots
+- [requirements.txt](requirements.txt): Python dependencies
+
+## Quick Setup
 
 Install the dependencies:
 
@@ -32,62 +49,28 @@ Install the dependencies:
 pip install -r requirements.txt
 ```
 
-## Quick Run
-
-Run the terminal demo:
-
-```bash
-python beginner_demo.py
-```
-
-Run a custom demo:
-
-```bash
-python beginner_demo.py --document "Quantum signatures are cool" --bits 768 --show-terms
-```
-
-Run a shorter, summary-only demo:
-
-```bash
-python beginner_demo.py --bits 256 --quiet
-```
-
-Open the beginner notebook:
-
-```bash
-jupyter notebook QDS_Beginner_Walkthrough.ipynb
-```
-
-Open the full research notebook:
+Open the main notebook:
 
 ```bash
 jupyter notebook QDS_Yin_et_al.ipynb
 ```
 
-## What The Beginner Path Covers
+If you want a faster first run, open the lighter walkthrough notebook instead:
 
-The beginner path focuses on the honest protocol flow:
+```bash
+jupyter notebook QDS_Beginner_Walkthrough.ipynb
+```
 
-1. Choose security parameters for a message length
-2. Simulate QKD-style shared keys
-3. Sign a document as Alice
-4. Verify the signature independently as Bob and Charlie
-5. Check whether both verifiers agree
+## Optional Terminal Demo
 
-This gives you the protocol workflow first, before you study the heavier mathematical sections.
+Run the simplified demo:
 
-## Suggested Learning Route
+```bash
+python beginner_demo.py
+```
 
-If a symbol-heavy cryptography notebook feels overwhelming, use this progression:
+Show a custom message and print the key terms:
 
-1. Learn the symbols in `BEGINNER_GUIDE.md`
-2. Run the small example in `QDS_Beginner_Walkthrough.ipynb`
-3. Use `beginner_demo.py` to try your own message and bit length
-4. Read `qds_beginner.py` to see the protocol as regular Python functions
-5. Return to `QDS_Yin_et_al.ipynb` for the detailed mathematics and security analysis
-
-## Notes
-
-- The QKD stage is abstracted as trusted pre-shared key generation.
-- The implementation focuses on the classical cryptographic part of the protocol.
-- The original notebook is still the best place to study the full paper-level reasoning.
+```bash
+python beginner_demo.py --document "Quantum signatures are cool" --bits 768 --show-terms
+```
